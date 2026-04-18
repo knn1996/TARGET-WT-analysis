@@ -1,0 +1,43 @@
+---
+title: "Will's Tumor Somatic Mutation Landscape"
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+if (!require("BiocManager")) install.packages("BiocManager")
+BiocManager::install("TCGAbiolinks")
+```
+
+```{r}
+library(TCGAbiolinks)
+
+# Clinical data
+clinical <- GDCquery_clinic(project = "TARGET-WT", type = "clinical")
+
+# MAF files
+query_maf <- GDCquery(
+  project = "TARGET-WT",
+  data.category = "Simple Nucleotide Variation",
+  data.type = "Masked Somatic Mutation",
+  access = "open"
+)
+
+dir.create("GDCdata", recursive = TRUE, showWarnings = FALSE)
+GDCdownload(query_maf, directory = "GDCdata")
+maf_data <- GDCprepare(query_maf, directory = "GDCdata")
+```
+
+```{r}
+clinical$Tumor_Sample_Barcode <- clinical$submitter_id
+maf_data$Tumor_Sample_Barcode <- substr(maf_data$Tumor_Sample_Barcode, 1, 16)
+```
+
+```{r}
+library(maftools)
+
+wt_maf <- read.maf(maf = maf_data, clinicalData = clinical)
+plotmafSummary(wt_maf)
+```
