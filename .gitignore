@@ -1,6 +1,5 @@
-.Rproj.user
+GDCdata/
+.quarto/
+.Rproj.user/
 .Rhistory
 .RData
-.Ruserdata
-"GDCdata/" 
-".quarto/" 
