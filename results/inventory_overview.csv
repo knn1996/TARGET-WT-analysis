@@ -1,0 +1,4 @@
+layer,n_files,n_aliquots,n_cases,total_size_gb
+snv,42,42,38,0
+expr,136,136,125,0.58
+meth,131,131,126,1.73

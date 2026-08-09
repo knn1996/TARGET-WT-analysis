@@ -1,0 +1,10 @@
+layer,type_code,n_aliquots
+expr,01,124
+expr,11,6
+expr,02,5
+expr,06,1
+meth,01,125
+meth,02,5
+meth,06,1
+snv,01,38
+snv,02,4
