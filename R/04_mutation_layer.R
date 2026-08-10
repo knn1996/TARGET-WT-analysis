@@ -1,6 +1,7 @@
 library(TCGAbiolinks)
 library(maftools)
 library(dplyr)
+source("R/barcodes.R")
 
 project <- "TARGET-WT"
 EXOME_MB <- 38
@@ -18,9 +19,11 @@ GDCdownload(q_snv)
 maf_df <- GDCprepare(q_snv)
 
 maf_df <- maf_df %>%
-  mutate(case = substr(Tumor_Sample_Barcode, 1, 16)) %>%
-  filter(substr(case, 14, 15) == "01") %>%
-  mutate(case = substr(case, 1, 13))
+  filter(is_primary_sample(Tumor_Sample_Barcode)) %>%
+  mutate(case = case_id(Tumor_Sample_Barcode))
+
+message("rows: ", nrow(maf_df), "  cases: ", length(unique(maf_df$case)))
+stopifnot(nrow(maf_df) > 0)
 
 maf <- read.maf(maf_df)
 
@@ -30,12 +33,14 @@ coding <- c("Missense_Mutation", "Nonsense_Mutation", "Frame_Shift_Del",
 
 burden <- maf_df %>%
   filter(Variant_Classification %in% coding) %>%
-  count(case, name = "n_coding_snv") %>%
+  dplyr::count(case, name = "n_coding_snv") %>%
   mutate(tmb = n_coding_snv / EXOME_MB) %>%
   arrange(n_coding_snv)
 
 write.csv(burden, "results/wt_mutation_burden.csv", row.names = FALSE)
-
+burden_stats
+head(gene_freq, 15)
+length(genes_kept)
 burden_stats <- data.frame(
   n_cases = nrow(burden),
   median_coding_snv = median(burden$n_coding_snv),
@@ -55,7 +60,7 @@ gene_hits <- maf_df %>%
 n_cases <- length(unique(maf_df$case))
 
 gene_freq <- gene_hits %>%
-  count(Hugo_Symbol, name = "n_mutated") %>%
+  dplyr::count(Hugo_Symbol, name = "n_mutated") %>%
   mutate(freq = n_mutated / n_cases) %>%
   arrange(desc(n_mutated))
 
@@ -63,18 +68,6 @@ write.csv(gene_freq, "results/wt_gene_frequency.csv", row.names = FALSE)
 
 genes_kept <- gene_freq %>% filter(freq >= PREVALENCE_CUTOFF) %>% pull(Hugo_Symbol)
 message("genes surviving >=", PREVALENCE_CUTOFF * 100, "% filter: ", length(genes_kept))
-
-mut_mat <- matrix(0L,
-                  nrow = length(genes_kept),
-                  ncol = n_cases,
-                  dimnames = list(genes_kept, sort(unique(maf_df$case))))
-
-for (g in genes_kept) {
-  hit_cases <- gene_hits$case[gene_hits$Hugo_Symbol == g]
-  mut_mat[g, colnames(mut_mat) %in% hit_cases] <- 1L
-}
-
-saveRDS(mut_mat, "data/mutation_binary_matrix.rds")
 
 pdf("results/wt_oncoplot.pdf", width = 9, height = 6)
 oncoplot(maf, top = 20)

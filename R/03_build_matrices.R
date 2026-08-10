@@ -1,6 +1,7 @@
 library(SummarizedExperiment)
 library(edgeR)
 library(matrixStats)
+source("R/barcodes.R")
 
 se_expr <- readRDS("data/se_expr_raw.rds")
 se_meth <- readRDS("data/se_meth_raw.rds")
@@ -9,16 +10,8 @@ N_TOP_GENES <- 5000
 N_TOP_CPGS <- 5000
 dir.create("results", showWarnings = FALSE)
 
-bc_field <- function(x, i) vapply(strsplit(x, "-"), `[`, character(1), i)
-
-case_id <- function(x) {
-  paste(bc_field(x, 1), bc_field(x, 2), bc_field(x, 3), sep = "-")
-}
-
 select_primary_one_per_case <- function(se) {
-  bc <- colnames(se)
-  is_primary <- substr(bc_field(bc, 4), 1, 2) == "01"
-  se <- se[, is_primary]
+  se <- se[, is_primary_sample(colnames(se))]
   cid <- case_id(colnames(se))
   ord <- order(cid, colnames(se))
   se <- se[, ord]

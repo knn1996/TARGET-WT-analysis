@@ -1,0 +1,4 @@
+project,n_patients,primary_only,recurrent_only,paired
+TARGET-ALL-P2,717,696,0,21
+TARGET-ALL-P3,2,1,1,0
+TARGET-WT,38,34,0,4

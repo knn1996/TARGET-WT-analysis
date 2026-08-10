@@ -1,0 +1,5 @@
+project,sample_class,n,median_snv,frac_over_50
+TARGET-ALL-P2,primary,21,13,0
+TARGET-ALL-P2,recurrent,21,35,0.2857142857142857
+TARGET-WT,primary,4,10.5,0
+TARGET-WT,recurrent,4,9.5,0
