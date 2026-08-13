@@ -55,6 +55,10 @@ pdf("results/mofa_factor_correlation.pdf", width = 5, height = 5)
 plot_factor_cor(model_main)
 dev.off()
 
+png("results/figures/mofa_variance_explained.png", width = 1400, height = 1100, res = 150)
+print(plot_variance_explained(model_main, max_r2 = 15))
+dev.off()
+
 Z_main <- get_factors(model_main)$group1
 
 stability <- list()

@@ -1,7 +1,7 @@
 library(TCGAbiolinks)
 library(maftools)
 library(dplyr)
-source("R/barcodes.R")
+source("barcodes.R")
 
 project <- "TARGET-WT"
 EXOME_MB <- 38
@@ -38,9 +38,7 @@ burden <- maf_df %>%
   arrange(n_coding_snv)
 
 write.csv(burden, "results/wt_mutation_burden.csv", row.names = FALSE)
-burden_stats
-head(gene_freq, 15)
-length(genes_kept)
+
 burden_stats <- data.frame(
   n_cases = nrow(burden),
   median_coding_snv = median(burden$n_coding_snv),
@@ -76,4 +74,8 @@ dev.off()
 pdf("results/wt_burden_distribution.pdf", width = 6, height = 4)
 hist(burden$n_coding_snv, breaks = 20,
      xlab = "coding SNVs per case", main = "TARGET-WT mutation burden (open access, n = 38)")
+dev.off()
+
+png("results/figures/wt_oncoplot.png", width = 1800, height = 1200, res = 150)
+oncoplot(maf, top = 20)
 dev.off()

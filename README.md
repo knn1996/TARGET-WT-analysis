@@ -26,20 +26,6 @@ variant rows** in total.
 At n = 38, a 10% prevalence filter requires four cases. Exactly one gene clears it: **TP53
 (13/38, 34%)**. The next most frequent genes are BCOR and TTN at 3 cases each.
 
-The same counting applied across four TARGET cohorts, processed through the
-identical GDC pipeline:
-
-| Project | Class | n | Median SNVs | % over 50 |
-|---|---|---|---|---|
-| TARGET-ALL-P3 | recurrent | 3 | 269 | 100% |
-| TARGET-ALL-P2 | recurrent | 21 | 35 | 29% |
-| TARGET-ALL-P2 | primary | 717 | 16 | 4% |
-| **TARGET-WT** | **primary** | **38** | **7.5** | **0%** |
-
-No Wilms tumour sample reaches 50 mutations — the rough floor below which
-fitting to COSMIC reference signatures becomes unstable. (Counts here include
-all variant classes; the coding-only median in the table above is 6.5.)
-
 Two observations from the frequency table matter more than the burden statistics:
 
 - **TP53's prominence is a cohort artifact.** TARGET-WT selected on anaplastic histology *or*
@@ -49,9 +35,29 @@ Two observations from the frequency table matter more than the burden statistics
   passenger gene — appears in 3.** A coding-only analysis of this cohort ranks a sequencing
   artifact above the disease's namesake gene.
 
-Mutational signature analysis was considered and rejected on the same grounds: de novo NMF
-extraction needs mutation counts in the hundreds per sample, and fitting to COSMIC reference
-signatures is unstable below roughly 50 mutations per sample.
+![Oncoplot of the 20 most frequently mutated genes across 38 TARGET-WT cases](results/figures/wt_oncoplot.png)
+
+*22 of 38 cases carry at least one variant, but only TP53 exceeds 10% prevalence. WT1 (5%) and DICER1 (3%) — both established Wilms tumour genes — sit at or below the level of TTN, a known passenger.*
+
+The same counting applied across four TARGET cohorts, processed through the identical GDC
+pipeline:
+
+| Project | Class | n | Median SNVs | % over 50 |
+|---|---|---|---|---|
+| TARGET-ALL-P3 | recurrent | 3 | 269 | 100% |
+| TARGET-ALL-P2 | recurrent | 21 | 35 | 29% |
+| TARGET-ALL-P2 | primary | 717 | 16 | 4% |
+| **TARGET-WT** | **primary** | **38** | **7.5** | **0%** |
+
+No Wilms tumour sample reaches 50 mutations, and the maximum observed is 27. Mutational
+signature analysis was considered and rejected on these grounds: de novo NMF extraction needs
+mutation counts in the hundreds per sample, and fitting to COSMIC reference signatures is
+unstable at these depths. (Counts in this comparison include all variant classes; the
+coding-only median in the table above is 6.5.)
+
+Four TARGET-WT patients have paired primary and recurrent samples. Burden is essentially
+unchanged between them (median 10.5 primary, 9.5 recurrent), and n = 4 rules out any paired
+analysis.
 
 A binary gene-level mutation matrix was the original plan for a third integration view. It was
 dropped because one qualifying gene cannot constitute a view.
@@ -118,6 +124,11 @@ reproduce with min |r| ≥ 0.95**, so none were discarded as fitting noise.
 | 9 | 1.9 | 2.2 | shared |
 | 10 | 2.4 | 1.5 | shared |
 
+![Variance explained by each factor in each view](results/figures/mofa_variance_explained.png)
+
+*Most factors are dominated by one view. Factor 2 is the only one with substantial variance in
+both.*
+
 Factors were selected by property rather than by index, since MOFA factor numbering and sign
 are not stable across refits: the *shared* factor is the one maximising the minimum variance
 explained across both views (Factor 2), and the *methylation-private* factor is the one with
@@ -152,6 +163,11 @@ of promoter hypermethylation tracking reduced expression.
 | 4 | 4.6 | 3.7 | +0.147 | 3.9e−04 | 5.1e−04 |
 | 6 | 3.8 | 1.0 | −0.124 | 2.7e−03 | 3.1e−03 |
 | 3 | 12.1 | 2.0 | −0.003 | 0.94 | 0.94 |
+
+![Factor 2 methylation weight against expression weight for 580 matched promoter-island probe-gene pairs](results/figures/f_shared_coupling_scatter.png)
+
+*The repressive relationship on Factor 2 is real but loose: r = −0.222 accounts for roughly 5%
+of the variance in expression weights.*
 
 **The main result: variance and coupling are decoupled.** Factor 3 explains the most expression
 variance in the cohort (12.1%) and shows no promoter-methylation coupling whatsoever (r =
@@ -205,14 +221,16 @@ top-100 list.
 
 ```
 R/barcodes.R              TARGET barcode field parsing (shared)
-00_data_inventory.R       layer availability, intersections, sample types
-02_download_layers.R      GDC download, expression + methylation
-03_build_matrices.R       aliquot selection, normalisation, feature selection
-04_mutation_layer.R       burden, gene frequency, oncoplot (descriptive)
-05_mofa_fit.R             MOFA2 fit, 5-seed stability
-06_clinical_align.R       clinical join, endpoint construction
-07_factor_features.R      detection QC, factor selection, coupling test
-results/                  all tables and figures
+R/00_data_inventory.R     layer availability, intersections, sample types
+R/01_feasibility_counts.R cross-cohort SNV burden comparison (WT vs ALL-P2/P3)
+R/02_download_layers.R    GDC download, expression + methylation
+R/03_build_matrices.R     aliquot selection, normalisation, feature selection
+R/04_mutation_layer.R     burden, gene frequency, oncoplot (descriptive)
+R/05_mofa_fit.R           MOFA2 fit, 5-seed stability
+R/06_clinical_align.R     clinical join, endpoint construction
+R/07_factor_features.R    detection QC, factor selection, coupling test
+results/                  tables
+results/figures/          figures (PNG for display, PDF for print)
 ```
 
 Run in numeric order from the repository root. `data/`, `models/` and `GDCdata/` are

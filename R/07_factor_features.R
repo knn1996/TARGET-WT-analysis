@@ -2,7 +2,7 @@ library(MOFA2)
 library(SummarizedExperiment)
 library(minfi)
 library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
-source("R/barcodes.R")
+source("barcodes.R")
 
 model <- readRDS("models/mofa_wt_main.rds")
 mofa_input <- readRDS("data/mofa_input.rds")
@@ -134,6 +134,14 @@ coupling <- do.call(rbind, lapply(shared_factors, function(f) {
              cor = round(unname(ct$estimate), 3), p = signif(ct$p.value, 3))
 }))
 write.csv(coupling, "results/f_shared_coupling_test.csv", row.names = FALSE)
+
+png("results/figures/f_shared_coupling_scatter.png", width = 1400, height = 1200, res = 150)
+plot(pairs$meth_weight, pairs$expr_weight, pch = 16, col = "#00000055",
+     xlab = "Factor 2 methylation weight (promoter CpG island)",
+     ylab = "Factor 2 expression weight")
+abline(lm(expr_weight ~ meth_weight, data = pairs), col = "firebrick", lwd = 2)
+abline(h = 0, v = 0, col = "grey70", lty = 2)
+dev.off()
 
 message("shared factor: ", shared_factor, "   meth-private factor: ", private_factor)
 message("promoter-island probes matched to expressed genes: ", nrow(pairs))
