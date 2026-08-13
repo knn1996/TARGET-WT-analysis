@@ -35,7 +35,7 @@ Two observations from the frequency table matter more than the burden statistics
   passenger gene — appears in 3.** A coding-only analysis of this cohort ranks a sequencing
   artifact above the disease's namesake gene.
 
-![Oncoplot of the 20 most frequently mutated genes across 38 TARGET-WT cases](results/figures/wt_oncoplot.png)
+![Oncoplot of the 20 most frequently mutated genes across 38 TARGET-WT cases](R/results/figures/wt_oncoplot.png)
 
 *22 of 38 cases carry at least one variant, but only TP53 exceeds 10% prevalence. WT1 (5%) and DICER1 (3%) — both established Wilms tumour genes — sit at or below the level of TTN, a known passenger.*
 
@@ -124,7 +124,7 @@ reproduce with min |r| ≥ 0.95**, so none were discarded as fitting noise.
 | 9 | 1.9 | 2.2 | shared |
 | 10 | 2.4 | 1.5 | shared |
 
-![Variance explained by each factor in each view](results/figures/mofa_variance_explained.png)
+![Variance explained by each factor in each view](R/results/figures/mofa_variance_explained.png)
 
 *Most factors are dominated by one view. Factor 2 is the only one with substantial variance in
 both.*
@@ -164,7 +164,7 @@ of promoter hypermethylation tracking reduced expression.
 | 6 | 3.8 | 1.0 | −0.124 | 2.7e−03 | 3.1e−03 |
 | 3 | 12.1 | 2.0 | −0.003 | 0.94 | 0.94 |
 
-![Factor 2 methylation weight against expression weight for 580 matched promoter-island probe-gene pairs](results/figures/f_shared_coupling_scatter.png)
+![Factor 2 methylation weight against expression weight for 580 matched promoter-island probe-gene pairs](R/results/figures/f_shared_coupling_scatter.png)
 
 *The repressive relationship on Factor 2 is real but loose: r = −0.222 accounts for roughly 5%
 of the variance in expression weights.*
